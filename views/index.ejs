@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Yönetim Paneli</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #2c2f33;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+        }
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .server-card {
+            transition: all 0.3s;
+        }
+        .server-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="text-center mb-4">
+                    <img src="<%= bot.user.displayAvatarURL() %>" alt="Bot Avatar" class="rounded-circle mb-2" width="80">
+                    <h5><%= bot.user.username %> Yönetim Paneli</h5>
+                    <p class="text-muted">Hoş geldiniz, <%= user.username %></p>
+                </div>
+                
+                <hr>
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="fas fa-home me-2"></i>Ana Sayfa
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-shield-alt me-2"></i>Guard Ayarları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-list me-2"></i>Log Ayarları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-cog me-2"></i>Genel Ayarlar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto px-4 py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Bot İstatistikleri</h2>
+                    <span class="badge bg-success">Çevrimiçi</span>
+                </div>
+
+                <!-- İstatistik Kartları -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Sunucu Sayısı</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><%= guilds.length %></div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-server fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Toplam Kullanıcı</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><%= bot.users.cache.size %></div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Ping</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><%= bot.ws.ping %>ms</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-signal fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stat-card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Çalışma Süresi</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="uptime">Yükleniyor...</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sunucu Listesi -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Sunucular</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <% guilds.forEach(guild => { %>
+                            <div class="col-md-4 mb-3">
+                                <div class="card server-card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <% if (guild.icon) { %>
+                                                <img src="<%= guild.icon %>" alt="<%= guild.name %>" class="rounded me-3" width="50" height="50">
+                                            <% } else { %>
+                                                <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <i class="fas fa-server text-white"></i>
+                                                </div>
+                                            <% } %>
+                                            <div>
+                                                <h6 class="card-title mb-0"><%= guild.name %></h6>
+                                                <small class="text-muted"><%= guild.memberCount %> üye</small>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <a href="/server/<%= guild.id %>" class="btn btn-sm btn-primary">Yönet</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Uptime'ı formatla
+        function formatUptime(ms) {
+            const days = Math.floor(ms / 86400000);
+            const hours = Math.floor(ms / 3600000) % 24;
+            const minutes = Math.floor(ms / 60000) % 60;
+            return `${days}g ${hours}s ${minutes}d`;
+        }
+
+        // API'den istatistikleri al
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                document.getElementById('uptime').textContent = formatUptime(data.uptime);
+            } catch (error) {
+                console.error('İstatistikler alınırken hata:', error);
+            }
+        }
+
+        // Sayfa yüklendiğinde çalıştır
+        document.addEventListener('DOMContentLoaded', fetchStats);
+        
+        // Her 30 saniyede bir güncelle
+        setInterval(fetchStats, 30000);
+    </script>
+</body>
+</html>

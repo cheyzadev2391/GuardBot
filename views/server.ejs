@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= guild.name %> Yönetimi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .settings-card {
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+        .settings-card:hover {
+            transform: translateY(-3px);
+        }
+        .form-switch .form-check-input {
+            width: 3em;
+        }
+        .sidebar {
+            background-color: #2c2f33;
+            color: white;
+            min-height: 100vh;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+        }
+        .info-badge {
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <div class="text-center mb-4">
+                    <a href="/" class="btn btn-sm btn-outline-light mb-3">← Ana Sayfa</a>
+                    <% if (guild.icon) { %>
+                        <img src="<%= guild.icon %>" alt="<%= guild.name %>" class="rounded-circle mb-2" width="80">
+                    <% } else { %>
+                        <div class="bg-secondary rounded-circle mb-2 d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                            <i class="fas fa-server fa-2x text-white"></i>
+                        </div>
+                    <% } %>
+                    <h5><%= guild.name %></h5>
+                    <p class="text-muted"><%= guild.memberCount %> üye</p>
+                </div>
+                
+                <hr>
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#genel">
+                            <i class="fas fa-info-circle me-2"></i>Genel Bilgiler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#guard">
+                            <i class="fas fa-shield-alt me-2"></i>Guard Ayarları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#log">
+                            <i class="fas fa-list me-2"></i>Log Ayarları
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#moderasyon">
+                            <i class="fas fa-gavel me-2"></i>Moderasyon
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto px-4 py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><%= guild.name %> Sunucusu</h2>
+                    <span class="badge bg-success">Çevrimiçi</span>
+                </div>
+
+                <!-- Genel Bilgiler -->
+                <div class="card mb-4" id="genel">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>Genel Bilgiler</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>🆔 Sunucu ID:</strong> <span class="badge bg-secondary info-badge"><%= guild.id %></span></p>
+                                <p><strong>👑 Sahip ID:</strong> <span class="badge bg-secondary info-badge"><%= guild.ownerId %></span></p>
+                                <p><strong>📅 Oluşturulma:</strong> <span class="badge bg-secondary info-badge"><%= new Date(guild.createdTimestamp).toLocaleDateString('tr-TR') %></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>👥 Üye Sayısı:</strong> <span class="badge bg-primary info-badge"><%= guild.memberCount %></span></p>
+                                <p><strong>🔊 Ses Kanalları:</strong> <span class="badge bg-info info-badge"><%= guild.channels.cache.filter(c => c.type === 2).size %></span></p>
+                                <p><strong>💬 Yazı Kanalları:</strong> <span class="badge bg-info info-badge"><%= guild.channels.cache.filter(c => c.type === 0).size %></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guard Ayarları -->
+                <div class="card mb-4" id="guard">
+                    <div class="card-header">
+                        <h5><i class="fas fa-shield-alt me-2"></i>Guard Ayarları</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card settings-card">
+                                    <div class="card-body">
+                                        <h6>🛡️ Otomatik Koruma</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="autoProtection" checked>
+                                            <label class="form-check-label" for="autoProtection">Otomatik koruma sistemi</label>
+                                        </div>
+                                        <small class="text-muted">Şüpheli etkinlikleri otomatik engeller</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card settings-card">
+                                    <div class="card-body">
+                                        <h6>🚫 Anti-Raid</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="antiRaid" checked>
+                                            <label class="form-check-label" for="antiRaid">Anti-raid koruması</label>
+                                        </div>
+                                        <small class="text-muted">Toplu katılımları engeller</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card settings-card">
+                                    <div class="card-body">
+                                        <h6>🤖 Anti-Bot</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="antiBot" checked>
+                                            <label class="form-check-label" for="antiBot">Bot koruması</label>
+                                        </div>
+                                        <small class="text-muted">Yetkisiz botları engeller</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card settings-card">
+                                    <div class="card-body">
+                                        <h6>🔗 Anti-Link</h6>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="antiLink">
+                                            <label class="form-check-label" for="antiLink">Link engelleme</label>
+                                        </div>
+                                        <small class="text-muted">Yetkisiz link paylaşımını engeller</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button class="btn btn-primary" onclick="saveGuardSettings()">
+                                <i class="fas fa-save me-2"></i>Ayarları Kaydet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Log Ayarları -->
+                <div class="card mb-4" id="log">
+                    <div class="card-header">
+                        <h5><i class="fas fa-list me-2"></i>Log Ayarları</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">📝 Log Kanalı</label>
+                            <select class="form-select" id="logChannel">
+                                <option value="">Log kanalı seçin</option>
+                                <% guild.channels.cache.filter(c => c.type === 0).forEach(channel => { %>
+                                    <option value="<%= channel.id %>">#<%= channel.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="logMessages" checked>
+                                    <label class="form-check-label" for="logMessages">Mesaj logları</label>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="logJoins" checked>
+                                    <label class="form-check-label" for="logJoins">Katılma/ayrılma logları</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="logModeration" checked>
+                                    <label class="form-check-label" for="logModeration">Moderasyon logları</label>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="logVoice">
+                                    <label class="form-check-label" for="logVoice">Ses logları</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="saveLogSettings()">
+                            <i class="fas fa-save me-2"></i>Log Ayarlarını Kaydet
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Moderasyon İstatistikleri -->
+                <div class="card mb-4" id="moderasyon">
+                    <div class="card-header">
+                        <h5><i class="fas fa-gavel me-2"></i>Moderasyon İstatistikleri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card text-center bg-danger text-white">
+                                    <div class="card-body">
+                                        <i class="fas fa-ban fa-2x mb-2"></i>
+                                        <h4 id="banCount">0</h4>
+                                        <small>Toplam Ban</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card text-center bg-warning text-dark">
+                                    <div class="card-body">
+                                        <i class="fas fa-user-slash fa-2x mb-2"></i>
+                                        <h4 id="kickCount">0</h4>
+                                        <small>Toplam Kick</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card text-center bg-info text-white">
+                                    <div class="card-body">
+                                        <i class="fas fa-volume-mute fa-2x mb-2"></i>
+                                        <h4 id="muteCount">0</h4>
+                                        <small>Toplam Mute</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="card text-center bg-secondary text-white">
+                                    <div class="card-body">
+                                        <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                                        <h4 id="warnCount">0</h4>
+                                        <small>Toplam Uyarı</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function saveGuardSettings() {
+            const settings = {
+                autoProtection: document.getElementById('autoProtection').checked,
+                antiRaid: document.getElementById('antiRaid').checked,
+                antiBot: document.getElementById('antiBot').checked,
+                antiLink: document.getElementById('antiLink').checked
+            };
+            
+            fetch(`/api/${'<%= guild.id %>'}/guard-settings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Guard ayarları kaydedildi!');
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Ayarlar kaydedilirken hata oluştu: ' + error.message);
+            });
+        }
+        
+        function saveLogSettings() {
+            const settings = {
+                channel: document.getElementById('logChannel').value,
+                messages: document.getElementById('logMessages').checked,
+                joins: document.getElementById('logJoins').checked,
+                moderation: document.getElementById('logModeration').checked,
+                voice: document.getElementById('logVoice').checked
+            };
+            
+            fetch(`/api/${'<%= guild.id %>'}/log-settings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Log ayarları kaydedildi!');
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Ayarlar kaydedilirken hata oluştu: ' + error.message);
+            });
+        }
+
+        // İstatistikleri yükle
+        async function loadStatistics() {
+            try {
+                const response = await fetch(`/api/${'<%= guild.id %>'}/moderation`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('banCount').textContent = result.data.counts.ban;
+                    document.getElementById('kickCount').textContent = result.data.counts.kick;
+                    document.getElementById('muteCount').textContent = result.data.counts.mute;
+                    document.getElementById('warnCount').textContent = result.data.counts.warn;
+                }
+            } catch (error) {
+                console.error('İstatistikler yüklenirken hata:', error);
+            }
+        }
+
+        // Sayfa yüklendiğinde çalıştır
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+            // Her 30 saniyede bir güncelle
+            setInterval(loadStatistics, 30000);
+        });
+    </script>
+</body>
+</html>
